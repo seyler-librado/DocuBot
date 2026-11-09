@@ -1,0 +1,55 @@
+# Ordenanzas municipales de España: un ejemplo fuera de México (otro dominio,
+# otro vocabulario, sin catálogo de lugares).
+#
+# Para usarlo:  cp -r ejemplos/ordenanzas-municipales-es config/perfiles/
+
+nombre: ordenanzas-municipales-es
+descripcion: Ordenanzas municipales publicadas por ayuntamientos de España
+
+descubrimiento:
+  dominios:
+    permitir: ["*.es"]
+    bloquear: ["boe.es"]   # el BOE tiene su propia búsqueda: aquí interesan los sitios municipales
+  fuentes:
+    # 0: buscar por materia (necesita SearXNG o un buscador con llave)
+    - tipo: buscador
+      motor: searxng
+      consultas:
+        - '"ordenanza municipal" {materia} ayuntamiento filetype:pdf'
+      variables:
+        materia: [ruido, terrazas, movilidad, limpieza, arbolado, tráfico, vivienda]
+      usar: dominios     # explora el sitio de cada ayuntamiento que aparezca
+      max_resultados: 15
+    # 1: unos ayuntamientos de inicio
+    - tipo: semillas
+      urls:
+        - https://www.madrid.es/
+        - https://www.valencia.es/
+        - https://www.zaragoza.es/
+  exploracion:
+    profundidad: 2
+    max_paginas: 50
+    secciones_prioritarias: [ordenanzas, normativa, reglamentos, sede electronica, transparencia]
+
+documentos:
+  extensiones: [pdf]
+  modo: palabras
+  tipos:
+    ORDENANZA:
+      nombre: Ordenanza municipal
+      patrones: ['ordenanza\s*(municipal|reguladora|fiscal)?']
+    REGLAMENTO:
+      nombre: Reglamento municipal
+      patrones: ['reglamento\s*(municipal|organico)']
+  excluir: [modelo de solicitud, instancia, formulario, impreso]
+  puntaje_minimo: 60
+
+fichas:
+  campos:
+    titulo: { tipo: texto, requerido: true }
+    ayuntamiento: { tipo: texto, descripcion: "municipio que la aprueba" }
+    fecha_aprobacion: { tipo: fecha }
+    boletin: { tipo: texto, descripcion: "boletín oficial donde se publicó (BOP, BOCM...) y su fecha" }
+    materia:
+      tipo: opcion
+      opciones: [Medio ambiente, Movilidad, Urbanismo, Convivencia, Fiscal, Servicios, Otra]

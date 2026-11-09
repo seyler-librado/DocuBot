@@ -1,0 +1,20 @@
+# SearXNG para DocuBot: buscador propio, sin llaves.
+# Se levanta con: docker compose --profile searxng up -d
+# Documentación: https://docs.searxng.org/admin/settings/
+use_default_settings: true
+
+server:
+  # se reemplaza con SEARXNG_SECRET (ver .env.example)
+  secret_key: "cambia-esto"
+  limiter: false          # solo lo usa DocuBot, dentro de la red de Docker
+  image_proxy: false
+
+search:
+  safe_search: 0
+  default_lang: "all"
+  formats:
+    - html
+    - json                # DocuBot lo necesita
+
+ui:
+  static_use_hash: true

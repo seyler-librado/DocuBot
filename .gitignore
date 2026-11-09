@@ -1,0 +1,37 @@
+# secretos
+.env
+
+# datos locales
+almacen/*
+!almacen/.gitkeep
+
+# perfiles propios: solo el ejemplo se versiona
+config/perfiles/*
+!config/perfiles/ejemplo.yaml
+
+# extensiones propias (proveedores de IA): solo el README y el ejemplo se versionan
+config/extensiones/*
+!config/extensiones/README.md
+!config/extensiones/ejemplo_proveedor.py
+
+# conjuntos dorados propios para medir a la IA
+config/evaluacion/*
+!config/evaluacion/README.md
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# node
+node_modules/
+dist/
+
+# editores / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo

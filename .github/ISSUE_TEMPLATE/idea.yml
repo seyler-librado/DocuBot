@@ -1,0 +1,19 @@
+name: Idea
+description: Una mejora o algo nuevo
+labels: [idea]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué problema resolvería?
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: ¿Cómo te lo imaginas?
+  - type: textarea
+    id: ejemplo
+    attributes:
+      label: Un caso real
+      description: Qué documentos o sitios, qué perfil.

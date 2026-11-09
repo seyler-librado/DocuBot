@@ -1,0 +1,57 @@
+# Perfil de ejemplo. Un perfil dice QUÉ buscar; el motor no sabe nada del tema.
+# Copia este archivo con otro nombre para crear el tuyo (los perfiles propios
+# no se versionan). Revisa que esté bien con: docubot perfiles validar
+
+nombre: reglamentos-municipales
+descripcion: Reglamentos municipales publicados en sitios de gobierno
+
+descubrimiento:
+  dominios:
+    permitir: ["*.gob.mx"]
+    bloquear: ["facebook.com", "*.blogspot.com"]
+  fuentes:
+    - tipo: semillas
+      urls:
+        - https://www.gob.mx/
+    - tipo: buscador
+      motor: searxng
+      consultas:
+        - 'reglamento municipal {tema} filetype:pdf'
+      variables:
+        tema: [tránsito, construcción, protección civil]
+      usar: dominios
+  exploracion:
+    sitemap: true
+    profundidad: 2
+    max_paginas: 40
+
+documentos:
+  extensiones: [pdf]
+  modo: palabras          # palabras | todos
+  tipos:
+    REGLAMENTO:
+      nombre: Reglamento municipal
+      patrones: ['reglamento']
+  excluir: [licencia, formato, solicitud]
+  puntaje_minimo: 60
+
+fichas:
+  campos:
+    titulo: { tipo: texto, requerido: true }
+    fecha_publicacion: { tipo: fecha }
+    materia: { tipo: texto }
+    lugar: { tipo: lugar, descripcion: "municipio y estado al que aplica" }
+
+# Catálogo de lugares para ubicar cada documento en el mapa (ver config/catalogos/mexico).
+geografia:
+  catalogo: ../catalogos/mexico/lugares.csv
+  poligonos: ../catalogos/mexico/lugares.geojson
+  nombre: mexico
+
+# Ajustes de red solo para este perfil (si no se ponen, se usan los de
+# config/docubot.yaml).
+# red:
+#   peticiones_por_segundo_por_dominio: 0.5
+#   # false = ignora robots.txt para buscar más a fondo. Úsalo con criterio:
+#   # el ritmo por dominio se sigue respetando.
+#   respetar_robots: false

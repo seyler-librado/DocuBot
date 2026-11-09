@@ -1,0 +1,142 @@
+# Instrumentos de planeación municipal en México: planes de desarrollo,
+# programas de desarrollo urbano, atlas de riesgos, ordenamiento, movilidad...
+#
+# Para usarlo:  cp -r ejemplos/planeacion-municipal-mx config/perfiles/
+# Al correrlo, elige qué fuentes usar: la lista de dominios explora 1,642 sitios
+# municipales; el buscador hace dos consultas por cada uno de los 2,475 municipios.
+
+nombre: planeacion-municipal-mx
+descripcion: Planes y programas de planeación publicados por los municipios de México
+
+descubrimiento:
+  dominios:
+    permitir: ["*.gob.mx", "*.org.mx", "*.com.mx"]
+    bloquear: ["facebook.com", "*.blogspot.com", "issuu.com", "scribd.com"]
+  fuentes:
+    # 0: explorar el sitio de cada municipio (cada documento hereda la clave INEGI de su fila)
+    - tipo: lista_dominios
+      archivo: municipios.csv
+      columna_lugar: clave
+    # 1: buscar en la web los documentos de cada municipio (necesita SearXNG o un buscador con llave)
+    - tipo: buscador
+      motor: searxng
+      consultas:
+        - '"plan municipal de desarrollo" {municipio} {estado} filetype:pdf'
+        - '"programa municipal de desarrollo urbano" {municipio} {estado} filetype:pdf'
+      variables: municipios.csv
+      columna_lugar: clave
+      usar: documentos
+      max_resultados: 10
+  exploracion:
+    sitemap: true
+    profundidad: 2
+    max_paginas: 60
+    secciones_prioritarias:
+      - transparencia
+      - normatividad
+      - planeacion
+      - desarrollo urbano
+      - documentos
+      - gaceta
+      - marco juridico
+      - implan
+      - obras publicas
+
+documentos:
+  extensiones: [pdf]
+  modo: palabras
+  # Patrones sobre el nombre del archivo, el texto del enlace y la ruta (sin acentos,
+  # en minúsculas; \s* también acepta nombres pegados como PlanMunicipalDeDesarrollo).
+  # Gana el primero que coincide.
+  tipos:
+    PMDU:
+      nombre: Programa municipal de desarrollo urbano
+      patrones:
+        - '(programa|plan)\s*(municipal|parcial|director|general)?\s*de\s*desarrollo\s*urbano'
+        - 'desarrollo\s*urbano\s*de\s*centro\s*de\s*poblacion'
+        - '\b(pmdu|pdum|pdduc?|pducp?)\b'
+    ATLAS:
+      nombre: Atlas de riesgos
+      patrones:
+        - 'atlas\s*(municipal\s*)?(de\s*)?(riesgos?|peligros?)'
+    PMD:
+      nombre: Plan municipal de desarrollo
+      patrones:
+        - 'plan\s*municipal\s*de\s*desarrollo'
+        - 'plan\s*de\s*desarrollo\s*municipal'
+        - 'programa\s*municipal\s*de\s*desarrollo'
+        - '\b(pmd|pdm)\b'
+    MOVILIDAD:
+      nombre: Programa de movilidad
+      patrones:
+        - '(plan|programa)\s*(integral\s*|municipal\s*)?de\s*movilidad'
+        - 'movilidad\s*(urbana|sustentable|no\s*motorizada)'
+        - '\bpimus\b'
+    PMOT:
+      nombre: Programa municipal de ordenamiento territorial
+      patrones:
+        - '(programa|plan)\s*municipal\s*de\s*ordenamiento\s*territorial'
+        - '\bpmot\b'
+    OET:
+      nombre: Ordenamiento ecológico o territorial
+      patrones:
+        - '(programa|plan)\s*(municipal\s*|local\s*)?de\s*ordenamiento\s*(ecologico|territorial|urbano)'
+        - 'ordenamiento\s*ecologico\s*(local|municipal|territorial)'
+        - '\b(poel|poet|pmoet)\b'
+    ZONIF:
+      nombre: Zonificación y usos de suelo
+      patrones:
+        - '(plan|programa|tabla|carta|matriz)\s*de\s*(zonificacion|usos?\s*de\s*suelo)'
+        - 'zonificacion\s*(secundaria|primaria|urbana)'
+        - 'carta\s*urbana'
+    NORMA:
+      nombre: Reglamento o código urbano
+      patrones:
+        - 'reglamento\s*de\s*(construccion|zonificacion|desarrollo\s*urbano|movilidad|imagen\s*urbana)'
+        - 'codigo\s*(reglamentario\s*)?(de\s*)?(desarrollo\s*urbano|ordenamiento|construccion|urbano)'
+  # Trámites y actos administrativos que viven en las mismas carpetas que los instrumentos
+  excluir:
+    - aviso de privacidad
+    - licencia
+    - permiso
+    - constancia
+    - dictamen
+    - acta de cabildo
+    - sesion ordinaria
+    - sesion extraordinaria
+    - convocatoria
+    - licitacion
+    - nomina
+    - informe de gobierno
+    - informe de actividades
+    - trimestral
+    - organigrama
+    - solicitud
+    - formato
+    - manual de
+    - consulta publica
+    - anteproyecto
+  puntaje_minimo: 60
+
+fichas:
+  campos:
+    titulo: { tipo: texto, requerido: true, descripcion: "título oficial tal como aparece en la portada" }
+    fecha_publicacion: { tipo: fecha, descripcion: "de publicación, aprobación o en el periódico oficial" }
+    vigencia_inicial: { tipo: numero, descripcion: "año en que empieza su vigencia" }
+    vigencia_final: { tipo: numero, descripcion: "año en que termina su vigencia" }
+    instancias: { tipo: lista, descripcion: "quién lo emite o publica (máximo 3): ayuntamiento, IMPLAN, secretaría..." }
+    lugar: { tipo: lugar, descripcion: "municipio y estado al que aplica" }
+    resumen: { tipo: texto, descripcion: "40 a 80 palabras: qué contiene y para qué sirve" }
+  instrucciones: |
+    Son instrumentos de planeación de gobiernos municipales de México: planes y
+    programas de desarrollo, desarrollo urbano, ordenamiento, atlas de riesgos,
+    movilidad y reglamentos urbanos.
+
+geografia:
+  catalogo: ../../catalogos/mexico/lugares.csv
+  poligonos: ../../catalogos/mexico/lugares.geojson
+  nombre: mexico
+
+red:
+  # muchos sitios municipales corren en servidores modestos
+  peticiones_por_segundo_por_dominio: 0.5

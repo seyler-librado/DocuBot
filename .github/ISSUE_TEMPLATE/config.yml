@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Preguntas frecuentes
+    url: https://github.com/seyler-librado/DocuBot/blob/main/docs/preguntas.md
+    about: Requisitos, redes que bloquean descargas, respaldos, legalidad.

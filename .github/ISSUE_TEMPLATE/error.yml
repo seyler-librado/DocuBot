@@ -1,0 +1,33 @@
+name: Error
+description: Algo no funciona como debería
+labels: [error]
+body:
+  - type: textarea
+    id: que
+    attributes:
+      label: ¿Qué pasó?
+      description: Qué hiciste, qué esperabas y qué pasó en cambio.
+    validations:
+      required: true
+  - type: textarea
+    id: perfil
+    attributes:
+      label: Perfil (sin datos privados)
+      description: La parte del YAML que importa.
+      render: yaml
+  - type: textarea
+    id: bitacora
+    attributes:
+      label: Bitácora
+      description: Lo relevante de `docker compose logs worker` o `docker compose logs api`.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Versión o commit
+      placeholder: "0.1.0 o el hash de git"
+  - type: dropdown
+    id: ia
+    attributes:
+      label: Proveedor de IA
+      options: [ninguno, ollama, openai, openai_compat, anthropic, propio]

@@ -1,0 +1,73 @@
+# Ajustes globales de DocuBot.
+# Las llaves y contraseñas NO van aquí: van en .env.
+# Cualquier valor se puede sobrescribir con variables de entorno
+# DOCUBOT_<SECCION>__<CAMPO> (p. ej. DOCUBOT_TRABAJADORES__DESCARGA=8).
+
+# IA para las fichas. La llave va en .env (DOCUBOT_IA__LLAVE).
+#   ninguno        sin fichas (solo descubre, descarga y extrae texto)
+#   ollama         local: docker compose --profile ollama up -d (url por omisión http://ollama:11434/v1)
+#   openai         api.openai.com
+#   openai_compat  cualquier servidor con la API de OpenAI (Groq, OpenRouter, LM Studio, vLLM...): pon su url
+#   anthropic      api.anthropic.com
+#   archivo.py:Clase   un proveedor propio en config/extensiones/ (ver su README)
+ia:
+  proveedor: ninguno
+  modelo: ""
+  url: ""
+  temperatura: 0
+  max_tokens_salida: 1500
+  timeout: 180           # segundos por respuesta
+  reintentos: 2          # ante fallas pasajeras, antes de devolver la tarea a la cola
+  vision: true           # leer por imagen los documentos escaneados (si el modelo puede)
+  paginas: 12            # páginas de texto que se le dan
+  paginas_imagen: 3      # páginas escaneadas que se le mandan como imagen
+  max_caracteres: 16000  # tope del texto que se le da
+
+# Cuántas tareas corre a la vez cada etapa del pipeline.
+trabajadores:
+  descubrimiento: 2
+  exploracion: 4
+  descarga: 4
+  extraccion: 2
+  ia: 1
+
+red:
+  # Identifícate: pon una URL o correo donde un administrador pueda contactarte.
+  user_agent: "DocuBot/0.1 (+https://github.com/seyler-librado/DocuBot)"
+  # Ritmo por dominio. Los sitios públicos suelen correr en servidores modestos.
+  peticiones_por_segundo_por_dominio: 1.0
+  simultaneas_por_dominio: 2
+  # false = ignora robots.txt (también se puede por perfil, en red.respetar_robots)
+  respetar_robots: true
+  timeout: 30            # segundos
+  reintentos: 3          # ante errores de conexión, 429 y 5xx (con espera creciente)
+  max_redirecciones: 10
+  max_mb_pagina: 10      # tamaño máximo de una página HTML
+  verificar_tls: true
+  # Si el certificado de un sitio está mal, reintenta sin verificarlo y lo anota.
+  reintentar_sin_tls: true
+
+# Búsqueda dentro de los documentos.
+# El texto completo siempre está activo. La búsqueda por tema (semántica) necesita
+# convertir el texto en vectores:
+#   local          un modelo chico multilingüe en CPU, dentro del contenedor (sin GPU ni llaves)
+#   ollama / openai / openai_compat   el endpoint /v1/embeddings de ese servidor (pon modelo y url)
+#   ninguno        solo búsqueda por palabras
+busqueda:
+  embeddings: local
+  modelo: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+  tamano_fragmento: 900     # caracteres por fragmento
+  solape: 150
+  max_fragmentos: 400       # por documento (desde las primeras páginas)
+  similitud_minima: 0.45    # por tema: qué tan parecido debe ser un documento para entrar (0 a 1)
+
+# Buscadores para las fuentes de tipo "buscador".
+# Las llaves (Brave, Serper, SerpAPI) van en .env; SearXNG no necesita llave.
+buscadores:
+  searxng_url: http://searxng:8080   # docker compose --profile searxng up -d
+  pais: ""        # p. ej. mx; vacío = sin preferencia
+  idioma: es
+
+almacen:
+  carpeta: /datos/almacen
+  tamano_max_mb: 200

@@ -1,0 +1,51 @@
+# Normas Oficiales Mexicanas (NOM) y normas mexicanas (NMX) publicadas en sitios de gobierno.
+#
+# Para usarlo:  cp -r ejemplos/normas-oficiales-mx config/perfiles/
+
+nombre: normas-oficiales-mx
+descripcion: Normas Oficiales Mexicanas y normas mexicanas en PDF
+
+descubrimiento:
+  dominios:
+    permitir: ["*.gob.mx"]
+  fuentes:
+    # 0: buscar por materia (necesita SearXNG o un buscador con llave)
+    - tipo: buscador
+      motor: searxng
+      consultas:
+        - '"norma oficial mexicana" {materia} filetype:pdf'
+      variables:
+        materia: [salud, agua, construcción, residuos, ruido, alimentos, seguridad en el trabajo, energía]
+      usar: documentos
+      max_resultados: 20
+    # 1: documentos ya rastreados por Common Crawl en el Diario Oficial y dependencias
+    - tipo: commoncrawl
+      patron: "*.gob.mx"
+      limite: 5000
+
+documentos:
+  extensiones: [pdf]
+  modo: palabras
+  tipos:
+    NOM:
+      nombre: Norma Oficial Mexicana
+      patrones: ['\bnom\s*\d{3}', 'norma\s*oficial\s*mexicana']
+    NMX:
+      nombre: Norma mexicana
+      patrones: ['\bnmx\s*[a-z]{1,3}\s*\d']
+  excluir: [proyecto de norma, consulta publica, formato, solicitud]
+  puntaje_minimo: 60
+
+fichas:
+  campos:
+    clave: { tipo: texto, requerido: true, descripcion: "clave de la norma, p. ej. NOM-001-SEMARNAT-2021" }
+    titulo: { tipo: texto, requerido: true, descripcion: "título completo de la norma" }
+    dependencia: { tipo: texto, descripcion: "secretaría o dependencia que la emite" }
+    fecha_publicacion: { tipo: fecha, descripcion: "fecha de publicación en el Diario Oficial de la Federación" }
+    materia:
+      tipo: opcion
+      opciones: [Salud, Medio ambiente, Agua, Energía, Construcción, Trabajo, Alimentos, Comercio, Otra]
+    resumen: { tipo: texto, descripcion: "qué regula, en 2 o 3 oraciones" }
+  instrucciones: |
+    Son normas técnicas mexicanas: Normas Oficiales Mexicanas (NOM, obligatorias)
+    y normas mexicanas (NMX, voluntarias). La clave suele estar en la portada.

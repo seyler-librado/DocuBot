@@ -26,7 +26,7 @@ dependencies = [
     "defusedxml>=0.7",
     "pypdf[crypto]>=5.0",
     "pypdfium2>=4.30",
-    "pillow>=10.4",
+    "pillow>=13.0.0",
     "pgvector>=0.3",
     "fastembed>=0.6",
 ]
